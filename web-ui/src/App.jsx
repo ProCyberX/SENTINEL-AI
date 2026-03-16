@@ -1,6 +1,9 @@
 import { createSignal, Show, onMount, For } from 'solid-js';
 import axios from 'axios';
 
+// YAHAN APNA RENDER URL EK VARIABLE MEIN DAAL DIYA HAI
+const BACKEND_URL = "https://sentinel-ai-mrgp.onrender.com";
+
 function App() {
   const [prompt, setPrompt] = createSignal('');
   const [generatedCode, setGeneratedCode] = createSignal('');
@@ -12,7 +15,8 @@ function App() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/history');
+      // ✅ LINK UPDATED 1
+      const res = await axios.get(`${BACKEND_URL}/api/history`);
       if (res.data.status === 'success') {
         setHistoryLogs(res.data.data);
       }
@@ -25,7 +29,6 @@ function App() {
     fetchHistory();
   });
 
-  // NEW: Function to restore data when history log is clicked
   const restoreFromVault = (log) => {
     if (!log.generated_code || !log.audit_report) {
       alert("This is an old log record that doesn't contain the full code and report. Please generate and save a new policy to test this feature!");
@@ -36,7 +39,6 @@ function App() {
     setAuditReport(log.audit_report);
     setSaveStatus("🔄 Successfully Restored from Vault History");
     
-    // Smooth scroll back to top to view the restored data
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -46,7 +48,8 @@ function App() {
     setLoadingTask('ARCHITECTING INFRASTRUCTURE...');
     setSaveStatus('');
     try {
-      const res = await axios.post('http://localhost:8000/generate', { prompt: prompt() });
+      // ✅ LINK UPDATED 2
+      const res = await axios.post(`${BACKEND_URL}/generate`, { prompt: prompt() });
       setGeneratedCode(res.data.generated_code);
       setAuditReport(''); 
     } catch (error) {
@@ -60,7 +63,8 @@ function App() {
     setIsLoading(true);
     setLoadingTask('RUNNING DEEP VULNERABILITY SCAN...');
     try {
-      const res = await axios.post('http://localhost:8000/audit', { prompt: generatedCode() });
+      // ✅ LINK UPDATED 3
+      const res = await axios.post(`${BACKEND_URL}/audit`, { prompt: generatedCode() });
       setAuditReport(res.data.audit_report);
     } catch (error) {
       alert("Error running audit.");
@@ -68,7 +72,6 @@ function App() {
     setIsLoading(false);
   };
 
-  // UPDATED: Now sends the code and report to the backend to be saved
   const handleSave = async () => {
     if (!generatedCode() || !auditReport()) return alert("Please generate and audit first!");
     setIsLoading(true);
@@ -78,7 +81,8 @@ function App() {
     const scoreVal = scoreMatch ? parseInt(scoreMatch[1], 10) : 0;
 
     try {
-      await axios.post('http://localhost:8000/api/save_log', {
+      // ✅ LINK UPDATED 4
+      await axios.post(`${BACKEND_URL}/api/save_log`, {
         prompt: prompt(),
         security_score: scoreVal,
         generated_code: generatedCode(),
