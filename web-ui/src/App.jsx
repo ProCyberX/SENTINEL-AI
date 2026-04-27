@@ -2,7 +2,7 @@ import { createSignal, Show, onMount, For } from 'solid-js';
 import axios from 'axios';
 
 // YAHAN APNA RENDER URL EK VARIABLE MEIN DAAL DIYA HAI
-const BACKEND_URL = "https://sentinel-ai-mrgp.onrender.com";
+const BACKEND_URL = "https://sentinel-ai-v2.onrender.com";
 
 function App() {
   const [prompt, setPrompt] = createSignal('');
